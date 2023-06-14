@@ -15,7 +15,7 @@ class SpaceShip(Sprite):
     
     def __init__(self):
         self.image_size = (60, 60)
-        self.position = [500,250]
+        self.position = [500,270]
         self.velocity = 15
         self.image = pygame.transform.scale(SPACESHIP, self.image_size)
         self.image_rect = self.image.get_rect()

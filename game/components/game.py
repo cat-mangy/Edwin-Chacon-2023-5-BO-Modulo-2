@@ -4,6 +4,8 @@ from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, F
 
 from game.components.spaceship import SpaceShip
 
+from game.components.enemyship import EnemyShip
+
 # Game tiene un "Spaceship" - Por lo general esto es iniciliazar un objeto Spaceship en el __init__
 class Game:
     def __init__(self):
@@ -19,6 +21,9 @@ class Game:
 
         # Game tiene un "Spaceship"
         self.spaceship = SpaceShip()
+        
+        # Game tiene un "Enemyship"
+        self.enemyship = EnemyShip()
 
 
 
@@ -46,6 +51,8 @@ class Game:
     def update(self):
         # pass
         self.spaceship.update()
+        self.enemyship.update_x()
+        self.enemyship.update_y()
 
     def draw(self):
         self.clock.tick(FPS)
@@ -55,6 +62,7 @@ class Game:
 
         # dibujamos el objeto en pantalla
         self.screen.blit(self.spaceship.image, self.spaceship.image_rect)
+        self.screen.blit(self.enemyship.image, self.enemyship.image_rect)
 
         pygame.display.update()
         pygame.display.flip()
