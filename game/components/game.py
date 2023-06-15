@@ -4,7 +4,11 @@ from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, F
 
 from game.components.spaceship import SpaceShip
 
-from game.components.enemyship import EnemyShip
+from game.components.spaceship import bullets
+
+from game.components.enemy_ship import enemys
+
+from game.components.enemy_ship import EnemyShip
 
 # Game tiene un "Spaceship" - Por lo general esto es iniciliazar un objeto Spaceship en el __init__
 class Game:
@@ -18,6 +22,8 @@ class Game:
         self.game_speed = 10
         self.x_pos_bg = 0
         self.y_pos_bg = 0
+        self.bullets = bullets
+        self.enemys = enemys
 
         # Game tiene un "Spaceship"
         self.spaceship = SpaceShip()
@@ -47,12 +53,16 @@ class Game:
             # si el "event" type es igual a pygame.QUIT entonces cambiamos playing a False
             if event.type == pygame.QUIT:
                 self.playing = False
+                
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    self.spaceship.shoot()
 
     def update(self):
         # pass
         self.spaceship.update()
-        self.enemyship.update_x()
-        self.enemyship.update_y()
+        self.enemyship.update()
+        self.bullets.update()
 
     def draw(self):
         self.clock.tick(FPS)
@@ -63,6 +73,17 @@ class Game:
         # dibujamos el objeto en pantalla
         self.screen.blit(self.spaceship.image, self.spaceship.image_rect)
         self.screen.blit(self.enemyship.image, self.enemyship.image_rect)
+        
+        for bullet in bullets:
+            self.screen.blit(bullet.image, bullet.image_rect)
+            
+        for enemy in self.enemys:
+            self.screen.blit(enemy.image, enemy.image_rect)
+            
+            collisions = pygame.sprite.groupcollide(bullets, self.enemys, True)
+            for bullets_collided in collisions.values():
+                for bullet in bullets_collided:
+                    bullets.remove(bullet)
 
         pygame.display.update()
         pygame.display.flip()
