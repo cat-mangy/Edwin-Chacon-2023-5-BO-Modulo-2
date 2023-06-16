@@ -6,11 +6,12 @@ from game.components.spaceship import SpaceShip
 
 from game.components.spaceship import bullets
 
-from game.components.enemy_ship import enemys
-
-from game.components.enemy_ship import EnemyShip
+from game.components.enemy_ship import EnemyShip, BULLET_ENEMY , bullets_enemy
 
 # Game tiene un "Spaceship" - Por lo general esto es iniciliazar un objeto Spaceship en el __init__
+
+GAME_START_EVENT = pygame.USEREVENT + 1
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -23,8 +24,8 @@ class Game:
         self.x_pos_bg = 0
         self.y_pos_bg = 0
         self.bullets = bullets
-        self.enemys = enemys
-
+        self.bullets_enemy = bullets_enemy
+        
         # Game tiene un "Spaceship"
         self.spaceship = SpaceShip()
         
@@ -36,16 +37,22 @@ class Game:
     def run(self):
         # Game loop: events - update - draw
         self.playing = True
+        
+        if pygame.sprite.spritecollide(self.enemyship, bullets_enemy, True):
+            self.playing = False
+            print("¡La nave ha sido alcanzada! Fin del juego.")
 
         # while self.playing == True
         while self.playing: # Mientras el atributo playing (self.playing) sea true "repito"
             self.handle_events()
             self.update()
             self.draw()
+            self.enemyship.shoot_enemy() 
         else:
             print("Something ocurred to quit the game!!!")
         pygame.display.quit()
         pygame.quit()
+        
 
     def handle_events(self):
         # Para un "event" (es un elemento) en la lista (secuencia) que me retorna el metodo get()
@@ -54,7 +61,7 @@ class Game:
             if event.type == pygame.QUIT:
                 self.playing = False
                 
-            elif event.type == pygame.KEYUP:
+            if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
                     self.spaceship.shoot()
 
@@ -63,6 +70,8 @@ class Game:
         self.spaceship.update()
         self.enemyship.update()
         self.bullets.update()
+        self.bullets_enemy.update()
+        
 
     def draw(self):
         self.clock.tick(FPS)
@@ -71,19 +80,14 @@ class Game:
 
 
         # dibujamos el objeto en pantalla
-        self.screen.blit(self.spaceship.image, self.spaceship.image_rect)
+        self.screen.blit(self.spaceship.image, self.spaceship.image_rect_s)
         self.screen.blit(self.enemyship.image, self.enemyship.image_rect)
         
         for bullet in bullets:
             self.screen.blit(bullet.image, bullet.image_rect)
             
-        for enemy in self.enemys:
-            self.screen.blit(enemy.image, enemy.image_rect)
-            
-            collisions = pygame.sprite.groupcollide(bullets, self.enemys, True)
-            for bullets_collided in collisions.values():
-                for bullet in bullets_collided:
-                    bullets.remove(bullet)
+        for bullet_enemy in bullets_enemy:
+            self.screen.blit(bullet_enemy.image, bullet_enemy.image_rect)
 
         pygame.display.update()
         pygame.display.flip()
