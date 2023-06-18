@@ -1,13 +1,11 @@
 import pygame
 from pygame.sprite import Sprite, Group
 
-from game.utils.constants import SPACESHIP, BULLET, SCREEN_HEIGHT, SCREEN_WIDTH
+from game.utils.constants import SPACESHIP, BURST ,BULLET, SCREEN_HEIGHT, SCREEN_WIDTH
 
 pygame.init()
 
-# Definir constantes y clases
-
-# ... Código de las clases SpaceShip y Bullet ...
+bullets = pygame.sprite.Group()
 
 class SpaceShip(Sprite):
     def __init__(self):
@@ -16,10 +14,14 @@ class SpaceShip(Sprite):
         self.position = [500, 270]
         self.velocity = 15
         self.image = pygame.transform.scale(SPACESHIP, self.image_size)
-        self.image_rect_s = self.image.get_rect()
-        self.image_rect_s.x = self.position[0]
-        self.image_rect_s.y = self.position[1]
-        self.image_rect_s.centerx = SCREEN_WIDTH // 2
+        self.image_nave = pygame.transform.scale(BURST, self.image_size)
+        self.rect = self.image.get_rect()  
+        self.rect.x = self.position[0]
+        self.rect.y = self.position[1]
+        self.rect.centerx = SCREEN_WIDTH // 2
+        self.lives = 3
+        self.time_hit = 0 
+        self.hit_duration = 500
 
     def update(self):
         keystate = pygame.key.get_pressed()
@@ -46,28 +48,41 @@ class SpaceShip(Sprite):
         if self.position[1] >= 540:
             self.position[1] = 540
 
-        self.image_rect_s.x = self.position[0]
-        self.image_rect_s.y = self.position[1]
+        self.rect.x = self.position[0]  
+        self.rect.y = self.position[1] 
+
+        if pygame.time.get_ticks() - self.time_hit < self.hit_duration:
+            self.image = pygame.transform.scale(BURST, self.image_size)
+        else:
+            self.image = pygame.transform.scale(SPACESHIP, self.image_size)
+
         
+    def get_hit(self):
+        self.lives -= 1
+        self.time_hit = pygame.time.get_ticks()
+
+        if self.lives <= 0:
+            self.kill()
+
+    def get_lives(self):
+        return self.lives
 
     def shoot(self):
-        bullet = Bullet(self.image_rect_s.centerx, self.image_rect_s.top)
+        bullet = Bullet(self.rect.centerx, self.rect.top)
         bullets.add(bullet)
 
-bullets = pygame.sprite.Group()
 
-class Bullet(pygame.sprite.Sprite):
+class Bullet(Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image_size = (60, 60)
         self.image = pygame.transform.scale(BULLET, self.image_size)
-        self.image_rect = self.image.get_rect()
-        self.image_rect.centerx = x
-        self.image_rect.y = y
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.y = y
         self.speed_y = -15
 
     def update(self):
-        self.image_rect.y += self.speed_y
-        if self.image_rect.bottom < 0:
+        self.rect.y += self.speed_y
+        if self.rect.bottom < 0:
             self.kill()
-
