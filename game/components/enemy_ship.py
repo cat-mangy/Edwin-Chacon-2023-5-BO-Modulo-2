@@ -70,6 +70,9 @@ class EnemyShip(Sprite):
         self.lives -= 1
         if self.lives <= 0:
             self.kill()
+            
+    def get_lives(self):
+        return self.lives
         
     def shoot_enemy(self):
             if self.moving_y:

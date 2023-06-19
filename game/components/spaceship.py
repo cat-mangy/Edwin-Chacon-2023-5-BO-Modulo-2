@@ -1,7 +1,10 @@
 import pygame
+import threading
+import time
+
 from pygame.sprite import Sprite, Group
 
-from game.utils.constants import SPACESHIP, BURST ,BULLET, SCREEN_HEIGHT, SCREEN_WIDTH
+from game.utils.constants import SPACESHIP, SPACESHIP_SHIELD , BURST ,BULLET, SCREEN_HEIGHT, SCREEN_WIDTH
 
 pygame.init()
 
@@ -14,7 +17,6 @@ class SpaceShip(Sprite):
         self.position = [500, 270]
         self.velocity = 15
         self.image = pygame.transform.scale(SPACESHIP, self.image_size)
-        self.image_nave = pygame.transform.scale(BURST, self.image_size)
         self.rect = self.image.get_rect()  
         self.rect.x = self.position[0]
         self.rect.y = self.position[1]
@@ -22,6 +24,9 @@ class SpaceShip(Sprite):
         self.lives = 3
         self.time_hit = 0 
         self.hit_duration = 500
+        self.shield_active = False
+        self.last_shield_activation = 0
+        self.shield_cooldown = 15
 
     def update(self):
         keystate = pygame.key.get_pressed()
@@ -55,6 +60,9 @@ class SpaceShip(Sprite):
             self.image = pygame.transform.scale(BURST, self.image_size)
         else:
             self.image = pygame.transform.scale(SPACESHIP, self.image_size)
+            
+        if self.shield_active:
+            self.image = pygame.transform.scale(SPACESHIP_SHIELD, self.image_size)
 
         
     def get_hit(self):
@@ -70,7 +78,20 @@ class SpaceShip(Sprite):
     def shoot(self):
         bullet = Bullet(self.rect.centerx, self.rect.top)
         bullets.add(bullet)
+    
+    def shield(self):
+        current_time = time.time()
+        if not self.shield_active and current_time - self.last_shield_activation >= self.shield_cooldown:
+            self.lives = float('inf')
+            self.shield_active = True
+            self.last_shield_activation = current_time
 
+            # Desactivar el escudo después de 5 segundos
+            threading.Timer(3.5, self.no_shield).start()
+
+    def no_shield(self):
+        self.lives = 2
+        self.shield_active = False
 
 class Bullet(Sprite):
     def __init__(self, x, y):

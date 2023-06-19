@@ -18,6 +18,9 @@ BG = pygame.image.load(os.path.join(IMG_DIR, 'Other/Track.png'))
 HEART = pygame.image.load(os.path.join(IMG_DIR, "corazon\corazon.png"))
 HEART = pygame.transform.scale(HEART, (40, 40))
 
+HEART_BAD = pygame.image.load(os.path.join(IMG_DIR, "corazon/corazon_villano.png"))
+HEART_BAD = pygame.transform.scale(HEART_BAD, (43, 43))
+
 DEATH = pygame.image.load(os.path.join(IMG_DIR, "widow\calavera.png"))
 DEATH = pygame.transform.scale(DEATH, (40, 40))
 
